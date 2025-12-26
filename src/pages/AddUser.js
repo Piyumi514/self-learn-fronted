@@ -1,29 +1,44 @@
-import React, { useState } from "react";
-import axios from "axios";
-import { createUser } from "../services/userServices";
+import React, { useEffect, useState } from "react";
+import { createUser, getUsers } from "../services/userServices";
 
 function AddUser() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
+  const [users, setUsers] = useState([]);
+
+  // Fetch users
+  const fetchUsers = async () => {
+    try {
+      const res = await getUsers();
+      setUsers(res.data);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
 
   const handleRegister = async (e) => {
     e.preventDefault();
 
     try {
-    //   const res = await axios.post(
-    //     "http://localhost:5000/api/auth/register",
-    //     { email, password }
-    //   );
-        const res = await createUser({ email, password });
+      const res = await createUser({ email, password });
       setMessage(res.data.message);
+
+      setEmail("");
+      setPassword("");
+
+      fetchUsers(); // refresh table
     } catch (err) {
-      setMessage(err.response.data.message);
+      setMessage(err.response?.data?.message || "Error adding user");
     }
   };
 
   return (
-    <div style={{ width: "300px", margin: "100px auto", textAlign: "center" }}>
+    <div style={{ width: "500px", margin: "50px auto", textAlign: "center" }}>
       <h2>➕ Add User</h2>
 
       <form onSubmit={handleRegister}>
@@ -31,6 +46,7 @@ function AddUser() {
           type="email"
           placeholder="Email"
           required
+          value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
         <br /><br />
@@ -39,6 +55,7 @@ function AddUser() {
           type="password"
           placeholder="Password"
           required
+          value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
         <br /><br />
@@ -47,6 +64,33 @@ function AddUser() {
       </form>
 
       <p>{message}</p>
+
+      <hr />
+
+      <h3>👥 Users List</h3>
+
+      <table border="1" width="100%" cellPadding="8">
+        <thead>
+          <tr>
+            <th>Number</th>
+            <th>Email</th>
+          </tr>
+        </thead>
+        <tbody>
+          {users.length > 0 ? (
+            users.map((user, index) => (
+              <tr key={user._id}>
+                <td>{index + 1}</td>
+                <td>{user.email}</td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan="2">No users found</td>
+            </tr>
+          )}
+        </tbody>
+      </table>
     </div>
   );
 }
