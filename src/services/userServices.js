@@ -9,3 +9,11 @@ export const createUser = async (userData) => {
 export const getUsers = async () => {
   return await axios.get(`${API_URL}/get-users`);
 };
+
+export const deleteUser = async (id) => {
+  return await axios.delete(`${API_URL}/delete-user/${id}`);
+};
+
+export const updateUser = async (id, data) => {
+  return await axios.put(`${API_URL}/update-user/${id}`, data);
+};

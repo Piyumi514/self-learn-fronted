@@ -1,20 +1,22 @@
 import React, { useEffect, useState } from "react";
-import { createUser, getUsers } from "../services/userServices";
+import {
+  createUser,
+  getUsers,
+  deleteUser,
+  updateUser
+} from "../services/userServices";
+import "../styles/AddUser.scss";
 
 function AddUser() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
   const [users, setUsers] = useState([]);
+  const [editId, setEditId] = useState(null);
 
-  // Fetch users
   const fetchUsers = async () => {
-    try {
-      const res = await getUsers();
-      setUsers(res.data);
-    } catch (err) {
-      console.log(err);
-    }
+    const res = await getUsers();
+    setUsers(res.data);
   };
 
   useEffect(() => {
@@ -24,21 +26,37 @@ function AddUser() {
   const handleRegister = async (e) => {
     e.preventDefault();
 
-    try {
-      const res = await createUser({ email, password });
-      setMessage(res.data.message);
+    if (editId) {
+      await updateUser(editId, { email });
+      setMessage("User updated successfully");
+      setEditId(null);
+    } else {
+      await createUser({ email, password });
+      setMessage("User added successfully");
+    }
 
-      setEmail("");
-      setPassword("");
+    setEmail("");
+    setPassword("");
+    fetchUsers();
+  };
 
-      fetchUsers(); // refresh table
-    } catch (err) {
-      setMessage(err.response?.data?.message || "Error adding user");
+  const handleEdit = (user) => {
+    setEmail(user.email);
+    setEditId(user._id);
+  };
+
+  const handleDelete = async (id) => {
+    if (window.confirm("Are you sure?")) {
+      await deleteUser(id);
+      fetchUsers();
     }
   };
 
   return (
-    <div style={{ width: "500px", margin: "50px auto", textAlign: "center" }}>
+    <div className="adduser-container">
+  <div className="adduser-card">
+
+    <div style={{ width: "600px", margin: "50px auto", textAlign: "center" }}>
       <h2>➕ Add User</h2>
 
       <form onSubmit={handleRegister}>
@@ -46,21 +64,28 @@ function AddUser() {
           type="email"
           placeholder="Email"
           required
-          value={email}
+          value={""}
           onChange={(e) => setEmail(e.target.value)}
+          autoComplete="off"
         />
+        {!editId && (
+          <>
+            <br /><br />
+            <input
+              type="password"
+              placeholder="Password"
+              required
+              value={""}
+              onChange={(e) => setPassword(e.target.value)}
+              autoComplete="off"
+            />
+          </>
+        )}
         <br /><br />
 
-        <input
-          type="password"
-          placeholder="Password"
-          required
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        <br /><br />
-
-        <button type="submit">Add User</button>
+        <button type="submit">
+          {editId ? "Update User" : "Add User"}
+        </button>
       </form>
 
       <p>{message}</p>
@@ -72,26 +97,30 @@ function AddUser() {
       <table border="1" width="100%" cellPadding="8">
         <thead>
           <tr>
-            <th>Number</th>
+            <th>#</th>
             <th>Email</th>
+            <th>Actions</th>
           </tr>
         </thead>
+
         <tbody>
-          {users.length > 0 ? (
-            users.map((user, index) => (
-              <tr key={user._id}>
-                <td>{index + 1}</td>
-                <td>{user.email}</td>
-              </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan="2">No users found</td>
+          {users.map((user, index) => (
+            <tr key={user._id}>
+              <td>{index + 1}</td>
+              <td>{user.email}</td>
+              <td>
+                <button onClick={() => handleEdit(user)}>✏ Edit</button>
+                &nbsp;
+                <button onClick={() => handleDelete(user._id)}>🗑 Delete</button>
+              </td>
             </tr>
-          )}
+          ))}
         </tbody>
       </table>
     </div>
+      </div>
+</div>
+
   );
 }
 
