@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { loginVerify } from "../services/loginService";
 import { useNavigate } from "react-router-dom";
-import "../styles/Login.scss";   // 👈 Import SCSS
+import "../styles/Login.scss"; // 👈 Import SCSS
 
 function Login() {
   const [email, setEmail] = useState("");

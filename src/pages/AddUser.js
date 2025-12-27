@@ -3,7 +3,7 @@ import {
   createUser,
   getUsers,
   deleteUser,
-  updateUser
+  updateUser,
 } from "../services/userServices";
 import "../styles/AddUser.scss";
 
@@ -54,73 +54,89 @@ function AddUser() {
 
   return (
     <div className="adduser-container">
-  <div className="adduser-card">
+      <div className="adduser-card">
+        <div
+          style={{ width: "600px", margin: "50px auto", textAlign: "center" }}
+        >
+          <h2>➕ Add User</h2>
 
-    <div style={{ width: "600px", margin: "50px auto", textAlign: "center" }}>
-      <h2>➕ Add User</h2>
-
-      <form onSubmit={handleRegister}>
-        <input
-          type="email"
-          placeholder="Email"
-          required
-          value={""}
-          onChange={(e) => setEmail(e.target.value)}
-          autoComplete="off"
-        />
-        {!editId && (
-          <>
-            <br /><br />
+          <form onSubmit={handleRegister} autoComplete="off">
+            {/* Hidden dummy inputs to prevent browser autofill */}
+            <input
+              type="text"
+              name="fakeusernameremembered"
+              style={{ display: "none" }}
+            />
             <input
               type="password"
-              placeholder="Password"
-              required
-              value={""}
-              onChange={(e) => setPassword(e.target.value)}
-              autoComplete="off"
+              name="fakepasswordremembered"
+              style={{ display: "none" }}
             />
-          </>
-        )}
-        <br /><br />
 
-        <button type="submit">
-          {editId ? "Update User" : "Add User"}
-        </button>
-      </form>
+            {/* REAL EMAIL */}
+            <input
+              type="email"
+              placeholder="Email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              autoComplete="new-email"
+            />
 
-      <p>{message}</p>
+            {!editId && (
+              <>
+                <br />
+                <br />
+                <input
+                  type="password"
+                  placeholder="Password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  autoComplete="new-password"
+                />
+              </>
+            )}
 
-      <hr />
+            <br />
+            <br />
+            <button type="submit">{editId ? "Update User" : "Add User"}</button>
+          </form>
 
-      <h3>👥 Users List</h3>
+          <p>{message}</p>
 
-      <table border="1" width="100%" cellPadding="8">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Email</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
+          <hr />
 
-        <tbody>
-          {users.map((user, index) => (
-            <tr key={user._id}>
-              <td>{index + 1}</td>
-              <td>{user.email}</td>
-              <td>
-                <button onClick={() => handleEdit(user)}>✏ Edit</button>
-                &nbsp;
-                <button onClick={() => handleDelete(user._id)}>🗑 Delete</button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+          <h3>👥 Users List</h3>
+
+          <table border="1" width="100%" cellPadding="8">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Email</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {users.map((user, index) => (
+                <tr key={user._id}>
+                  <td>{index + 1}</td>
+                  <td>{user.email}</td>
+                  <td>
+                    <button onClick={() => handleEdit(user)}>✏ Edit</button>
+                    &nbsp;
+                    <button onClick={() => handleDelete(user._id)}>
+                      🗑 Delete
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
-</div>
-
+    </div>
   );
 }
 
