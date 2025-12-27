@@ -58,11 +58,16 @@
     }
   }
 
-  p {
-    margin-top: 10px;
-    font-weight: 500;
-    color: green;
-  }
+.message-success {
+  color: green;
+  font-weight: bold;
+}
+
+.message-error {
+  color: red;
+  font-weight: bold;
+}
+
 
   hr {
     margin: 25px 0;

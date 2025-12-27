@@ -13,6 +13,7 @@ function AddUser() {
   const [message, setMessage] = useState("");
   const [users, setUsers] = useState([]);
   const [editId, setEditId] = useState(null);
+  const [messageType, setMessageType] = useState(""); // "success" or "error"
 
   const fetchUsers = async () => {
     const res = await getUsers();
@@ -26,18 +27,29 @@ function AddUser() {
   const handleRegister = async (e) => {
     e.preventDefault();
 
-    if (editId) {
-      await updateUser(editId, { email });
-      setMessage("User updated successfully");
-      setEditId(null);
-    } else {
-      await createUser({ email, password });
-      setMessage("User added successfully");
-    }
+    try {
+      if (editId) {
+        await updateUser(editId, { email });
+        setMessage("User updated successfully");
+        setMessageType("success");
+        setEditId(null);
+      } else {
+        await createUser({ email, password });
+        setMessage("User added successfully");
+        setMessageType("success");
+      }
 
-    setEmail("");
-    setPassword("");
-    fetchUsers();
+      setEmail("");
+      setPassword("");
+      fetchUsers();
+    } catch (err) {
+      setMessage(
+        err.response && err.response.data && err.response.data.message
+          ? err.response.data.message
+          : "An error occurred"
+      );
+      setMessageType("error");
+    }
   };
 
   const handleEdit = (user) => {
@@ -103,7 +115,13 @@ function AddUser() {
             <button type="submit">{editId ? "Update User" : "Add User"}</button>
           </form>
 
-          <p>{message}</p>
+          <p
+            className={
+              messageType === "success" ? "message-success" : "message-error"
+            }
+          >
+            {message}
+          </p>
 
           <hr />
 
